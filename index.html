@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style type="text/css">
+		
+		  /*#div{
+		  	height:1000px ;
+				width:1200 px;
+				margin: 0 auto ;
+				/*background: url(../0723python/img/2.png);*/
+				/*text-align: center;
+		  	transition: all 2s;*/
+		  }*/
+			#div1{
+				height:1200px ;
+				width:1800 px;
+				margin: 0 auto ;
+				/*background: url(../0723python/img/0.jpg);*/
+				text-align: center;
+				
+			}
+			
+			
+		</style>
+		
+	</head>
+    <body>
+    	<audio src="img/詹雅雯 - 爱需要勇气.mp3" autoplay="autoplay"></audio>
+    	
+    	<div id="div">
+    	<div id="div1">
+    	<canvas id="canvas1" width="800" height="600"></canvas>
+		</div>
+		</div>
+		<audio src=""></audio>
+		<!--
+			1：表盘
+			2：刻度
+			3：指针
+			4：获取时间
+			
+			获取时间，重新绘制：每隔1秒钟绘制：
+		-->
+		
+		<script type="text/javascript">
+		//获取画板
+			var canvas1=document.querySelector('#canvas1')
+			//获取画笔
+			var ctx=canvas1.getContext('2d')
+			
+			//径向变色？？？？？？？？？？？？？
+			 var jianbian=ctx.createRadialGradient(300,200,60,400,400,200)
+					jianbian.addColorStop(0,'red')
+					jianbian.addColorStop(1,'yellow')
+//			 ctx.rect(100,100,400,400)
+			
+			//绘制图片
+			var backgroundImg=new Image()
+			backgroundImg.src='./img/0.jpg'
+			
+			function drawTime(){
+				//清盘,每秒钟清洗画纸一遍，可以避免每旋转一次的路劲都保留下来
+				ctx.clearRect(0,0,800,600)
+				   
+				    ctx.fillStyle=jianbian
+					ctx.fill()
+				    ctx.drawImage(backgroundImg,400,300,400,330)
+				    
+				    
+				//画表盘
+			ctx.beginPath()
+			ctx.arc(400,300,200,0,2*Math.PI)
+			
+			ctx.lineWidth=8
+			ctx.strokeStyle='green'
+			
+			ctx.stroke()
+			ctx.closePath()
+			ctx.save()//保留这个坐标系的位置，以及保留ctx的属性样式
+			//将坐标原点移动到位置(400,300)
+			ctx.translate(400,300)
+			ctx.save()//保留了移动后的坐标原点为400，300像素位置的坐标系
+			
+			
+			//画分钟的刻度
+			for(var i=0;i<60;i++){
+			 	
+			 	ctx.rotate(2*Math.PI/60)
+				ctx.beginPath()
+				
+//				ctx.moveTo(170,0)
+//				ctx.lineTo(190,0)
+                ctx.arc(190,0,1,0,2*Math.PI)
+				
+				ctx.strokeStyle='firebrick'
+				ctx.lineWidth=5
+				ctx.stroke()
+				ctx.closePath()
+			 }
+			
+			ctx.restore()//恢复到没有旋转前，恢复到坐标系为400，300像素位置的坐标系
+			ctx.save()//再将恢复到没有旋转前，恢复到坐标系为400，300像素位置的坐标系此状态保存一下
+			
+			//画时钟的刻度
+			for(var i=0;i<12;i++){
+				ctx.rotate(2*Math.PI/12)
+				ctx.beginPath()//开始提笔
+				ctx.moveTo(175,0)
+				ctx.lineTo(195,0)
+				//设置样式
+				ctx.strokeStyle='darkgoldenrod'
+				ctx.lineWidth=8
+				//使画出的东西展现出来
+				ctx.stroke()
+				ctx.closePath()//开始收笔
+			}
+			
+			ctx.restore()
+			ctx.save()
+			
+			//将坐标系逆时针旋转90
+			ctx.rotate(-2*Math.PI/4)
+			ctx.save()
+			
+			//获取时间
+		    var nowTime=new Date()
+		    //获取小时
+			var hour=nowTime.getHours()
+			//获取分钟
+			var min=nowTime.getMinutes()
+			//获取秒钟
+			var sec=nowTime.getSeconds()
+			
+			if(hour>12){
+				hour=hour-12
+			}
+			console.log(hour,min,sec)
+			//画时针
+			//画秒针
+		   ctx.beginPath()
+		   //表盘被分成60份，秒针每秒走一份sec秒要转的角度2*Math.PI/60*sec
+		   ctx.rotate(2*Math.PI/60*sec)
+		   ctx.moveTo(-20,0)
+		   ctx.lineTo(140,0)
+		   
+		   ctx.strokeStyle='red'
+		   ctx.lineWidth=3
+		   
+		   ctx.stroke()
+		   ctx.closePath()
+		    ctx.restore()
+		     ctx.save()
+		   //画分针
+		   ctx.beginPath()
+		   //表盘被分成60份，分针每分针走一份，加上秒针每60秒（秒针每60秒等于一分钟）要走的
+		   ctx.rotate(2*Math.PI/60*min+2*Math.PI/60*sec/60)
+		   ctx.moveTo(-15,0)
+		   ctx.lineTo(110,0)
+		   
+		   ctx.strokeStyle='green'
+		   ctx.lineWidth=6
+		   ctx.closePath()
+		    ctx.stroke()
+		   ctx.restore()
+		   //画时针
+		   ctx.beginPath()
+		   //表盘对应时针来说被分成了12份，每小时走一份，对于分针的影响每min/60要走2*Math.PI/12*min/60，
+		   //对于秒针影响来说每sec/60/60也要2*Math.PI/12*sec/60/60
+		   ctx.rotate(2*Math.PI/12*hour+2*Math.PI/12*min/60+2*Math.PI/12*sec/60/60)
+		   ctx.moveTo(-10,0)
+		   ctx.lineTo(95,0)
+		   
+		   ctx.strokeStyle='blue'
+		   ctx.lineWidth=8
+		   
+		   ctx.stroke()
+		   ctx.closePath()
+		   ctx.restore()
+		   
+		   ctx.restore()
+		   ctx.restore()
+		   
+		   //设置水印字体
+		    ctx.font='50px 华文行楷'
+			ctx.fillStyle='hotpink'
+			ctx.fillText('当前时间：'+hour+':'+min+':'+sec,380,550)	 
+			ctx.fillStyle='brown'
+			ctx.fillText('你的努力，时间看的见！',0,50)	   
+		   //尽最大能力去渲染，也可以保证不卡帧，请求动画帧的方法。比setInterval(间隔多长时间要执行的函数，隔多少毫秒)
+		   //好，因为在这里setInterval有间隔等待时间，而requestAnimationFrame(drawTime)是完成任务后立马再次调用函数
+		   requestAnimationFrame(drawTime)
+			}
+			
+			//这是第一种画动画的方式
+//			setInterval(function(){
+//				drawTime()
+//			},20)
+
+//        第二种画动画的方式
+			requestAnimationFrame(drawTime)
+		   
+			
+		</script>
+		
+		
+	</body>
+</html>
